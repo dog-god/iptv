@@ -1,0 +1,82 @@
+/*
+ * Copyright (C) 2010, 2011, 2012 Apple Inc. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY APPLE INC. AND ITS CONTRIBUTORS ``AS IS''
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL APPLE INC. OR ITS CONTRIBUTORS
+ * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+ * THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+#ifndef NetworkProcessConnection_h
+#define NetworkProcessConnection_h
+
+#include "Connection.h"
+#include "ShareableResource.h"
+#include <wtf/RefCounted.h>
+#include <wtf/text/WTFString.h>
+
+#if ENABLE(NETWORK_PROCESS)
+
+namespace WebCore {
+class ResourceError;
+class ResourceRequest;
+class ResourceResponse;
+}
+
+namespace WebKit {
+
+typedef uint64_t ResourceLoadIdentifier;
+
+class NetworkProcessConnection : public RefCounted<NetworkProcessConnection>, CoreIPC::Connection::Client {
+public:
+    static PassRefPtr<NetworkProcessConnection> create(CoreIPC::Connection::Identifier connectionIdentifier)
+    {
+        return adoptRef(new NetworkProcessConnection(connectionIdentifier));
+    }
+    ~NetworkProcessConnection();
+    
+    CoreIPC::Connection* connection() const { return m_connection.get(); }
+
+private:
+    NetworkProcessConnection(CoreIPC::Connection::Identifier);
+
+    // CoreIPC::Connection::Client
+    virtual void didReceiveMessage(CoreIPC::Connection*, CoreIPC::MessageID, CoreIPC::MessageDecoder&);
+    virtual void didReceiveSyncMessage(CoreIPC::Connection*, CoreIPC::MessageID, CoreIPC::MessageDecoder&, OwnPtr<CoreIPC::MessageEncoder>&);
+    virtual void didClose(CoreIPC::Connection*);
+    virtual void didReceiveInvalidMessage(CoreIPC::Connection*, CoreIPC::StringReference messageReceiverName, CoreIPC::StringReference messageName) OVERRIDE;
+
+    void didReceiveNetworkProcessConnectionMessage(CoreIPC::Connection*, CoreIPC::MessageID, CoreIPC::MessageDecoder&);
+    void didReceiveSyncNetworkProcessConnectionMessage(CoreIPC::Connection*, CoreIPC::MessageID, CoreIPC::MessageDecoder&, OwnPtr<CoreIPC::MessageEncoder>&);
+
+    void willSendRequest(uint64_t requestID, ResourceLoadIdentifier, const WebCore::ResourceRequest&, const WebCore::ResourceResponse&);
+    void didReceiveResponse(ResourceLoadIdentifier, const WebCore::ResourceResponse&);
+    void didReceiveResource(ResourceLoadIdentifier, const ShareableResource::Handle&, double finishTime);
+    void didFailResourceLoad(ResourceLoadIdentifier, const WebCore::ResourceError&);
+
+    // The connection from the web process to the network process.
+    RefPtr<CoreIPC::Connection> m_connection;
+};
+
+} // namespace WebKit
+
+#endif // ENABLE(NETWORK_PROCESS)
+
+
+#endif // NetworkProcessConnection_h

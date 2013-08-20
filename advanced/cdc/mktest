@@ -1,0 +1,20 @@
+#!/bin/sh
+#export CVM_TARGET_TOOLS_PREFIX=
+export J2ME_CLASSLIB=foundation
+export USE_MIDP=true
+export CVM_JIT=false
+export JDK_HOME=/home/armite/Downloads/j2sdk1.4.2_19
+#export USER_SPECIFIED_LOCATION=false
+export USE_VERBOSE_MAKE=true
+export USE_DIRECTDRAW=true
+#export USE_DIRECTFB=true
+export USE_MIDP_MALLOC=true
+#export USE_GCI=true
+#export CVM_BUILD_SO=true
+export CVM_PRELOAD_LIB=true
+
+#make -C build/linux-x86-generic clean
+make -C build/linux-x86-generic 
+
+
+

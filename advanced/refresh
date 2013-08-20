@@ -1,0 +1,2 @@
+find -L . -name "*.cpp" -o -name "*.h" -o -name "*.hpp" -o -name "*.c" -o -name "*.java"> cscope.files
+cscope -bqi cscope.files

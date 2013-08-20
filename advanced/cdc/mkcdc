@@ -1,0 +1,25 @@
+#!/bin/sh
+export PATH=/home/armite/android-ndk-r8e/toolchains/arm-linux-androideabi-4.6/prebuilt/linux-x86_64/bin:$PATH
+export CVM_TARGET_TOOLS_PREFIX=arm-linux-androideabi-
+export J2ME_CLASSLIB=foundation
+export USE_MIDP=true
+export CVM_JIT=false
+export JDK_HOME=/home/armite/Downloads/j2sdk1.4.2_19
+#export USER_SPECIFIED_LOCATION=false
+#export CVM_USE_NATIVE_TOOLS=true
+export USE_VERBOSE_MAKE=true
+export BUILD_VERBOSE=true
+export USE_DIRECTDRAW=true
+#export USE_DIRECTFB=true
+export USE_MIDP_MALLOC=true
+#export USE_GCI=true
+export TOOLS_DIR=/home/armite/webkit/advanced/tools
+export TOOLS_OUTPUT_DIR=/home/armite/webkit/advanced/tools/output
+export CVM_BUILD_SO=true
+export CVM_PRELOAD_LIB=true
+
+#make -C build/linux-arm-generic clean
+make -C build/linux-arm-generic 
+
+
+
